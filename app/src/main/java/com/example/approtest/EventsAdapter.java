@@ -1,7 +1,6 @@
 package com.example.approtest;
 
 import android.graphics.Bitmap;
-
 import android.graphics.BitmapFactory;
 import android.util.Base64;
 import android.view.LayoutInflater;
@@ -17,6 +16,7 @@ import java.util.List;
 public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewHolder>{
 
     private final List<Event> events;
+
     private final ChatEventListener chatEventListener;
 
     public EventsAdapter(List<Event> events, ChatEventListener chatEventListener) {
@@ -58,9 +58,10 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
 
         void setEventData(Event event){
             binding.eventNameText.setText(event.eventName);
-           // binding.chatImage.setImageBitmap(getEventImage(event.encodedImage)); /**************************** EYAL **************************************/
+            binding.chatImage.setImageBitmap(getEventImage(event.encodedImage));
             binding.getRoot().setOnClickListener(v -> chatEventListener.onChatEventClicked(event));
         }
+
 
     }
 

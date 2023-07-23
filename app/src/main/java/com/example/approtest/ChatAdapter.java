@@ -105,10 +105,12 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             binding = itemContainerReceivedMessageBinding;
         }
 
+
         void setData(ChatMessage chatMessage){
             binding.receivedMessageText.setText(chatMessage.message);
             binding.receivedMessageDate.setText(chatMessage.dateTime);
             binding.receivedMessageUser.setText(chatMessage.sender.getFullName());
+
         }
     }
 

@@ -4,22 +4,22 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.preference.PreferenceManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.approtest.databinding.FragmentChatsBinding;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Date;
+
 import java.util.HashMap;
 import java.util.List;
+import java.util.Queue;
 
 
 public class ChatsFragment extends Fragment implements ChatEventListener {
@@ -28,6 +28,12 @@ public class ChatsFragment extends Fragment implements ChatEventListener {
 
     User current;
     HashMap<String, Event> events;
+
+    private List<ChatMessage> conversations;
+    private RecentConversationAdapter conversationAdapter;
+
+    private FirebaseFirestore database;
+
 
     public ChatsFragment(HashMap<String, Event> events, User current) {
         this.events = events;
@@ -38,14 +44,22 @@ public class ChatsFragment extends Fragment implements ChatEventListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = FragmentChatsBinding.inflate(getLayoutInflater());
+        init();
         getCurrentEvents();
     }
+
+    public void init(){
+        conversations= new ArrayList<>();
+        conversationAdapter = new RecentConversationAdapter(conversations);
+        binding.eventsRecyclerView.setAdapter(conversationAdapter);
+        database = FirebaseFirestore.getInstance();
+    }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-//        return inflater.inflate(R.layout.fragment_chats, container, false);
         return binding.getRoot();
     }
 
@@ -83,12 +97,12 @@ public class ChatsFragment extends Fragment implements ChatEventListener {
 
     }
 
+
     @Override
     public void onChatEventClicked(Event event) {
         Intent intent = new Intent(getActivity().getApplicationContext(), ChatActivity.class);
         intent.putExtra(Constants.KEY_EVENT, event);
         intent.putExtra(Constants.KEY_CURRENT_USER, current);
         startActivity(intent);
-//        getActivity().finish();
     }
 }

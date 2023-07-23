@@ -19,13 +19,11 @@ public class Event implements Serializable {
 
     protected String encodedImage;
 
-
-
-    public Event (String eventName, String date, double latitude, double longitude, HashMap<String,User> participants, ArrayList<ChatMessage> chatMessages){
-        this(eventName,date, latitude, longitude);
+    public Event (String eventName, String date, double latitude, double longitude, HashMap<String,User> participants, ArrayList<ChatMessage> chatMessages, String encodedImage){
+        this(eventName,date, latitude, longitude,encodedImage);
         for(Map.Entry<String,User> entry : participants.entrySet())
         {
-           this.participants.put(entry.getKey(),entry.getValue()) ;
+            this.participants.put(entry.getKey(),entry.getValue()) ;
         }
 //        for(int i=0 ;i  < chat.size();i++)
 //        {
@@ -34,12 +32,13 @@ public class Event implements Serializable {
 
     }
 
-    public Event (String eventName, String date, double latitude, double longitude){
+    public Event (String eventName, String date, double latitude, double longitude,String encodedImage){
         this.eventName = String.valueOf(eventName);
         this.date = String.valueOf(date);
         this.latitude = latitude;
         this.longitude = longitude;
         this.participants = new HashMap<String,User>();
+        this.encodedImage = String.valueOf(encodedImage);
 //        this.chat = new ArrayList<ChatMessage>();
     }
 
@@ -51,12 +50,17 @@ public class Event implements Serializable {
         this.latitude = event.getLatitude();;
         this.longitude = event.getLongitude();
         this.participants = event.getParticipants();
-//        this.chat = event.getChat();
+        this.encodedImage = getEncodedImage();
     }
     public Event()
     {
         this.participants = new HashMap<String,User>();
 //        this.chat = new ArrayList<ChatMessage>();
+    }
+
+    public void setEncodedImage(String encodedImage)
+    {
+        this.encodedImage = String.valueOf(encodedImage);
     }
 
     public String getEventName(){
@@ -70,6 +74,8 @@ public class Event implements Serializable {
     public String getDate() {
         return date;
     }
+
+    public String getEncodedImage(){return String.valueOf(encodedImage);}
 
     public HashMap<String, User> getParticipants() {
         HashMap<String,User> users = new HashMap<String,User>();

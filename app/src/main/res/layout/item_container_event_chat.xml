@@ -8,21 +8,21 @@
 
     <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/chat_image"
-        android:layout_width="@dimen/_35sdp"
-        android:layout_height="@dimen/_35sdp"
+        android:layout_width="@dimen/_36sdp"
+        android:layout_height="@dimen/_36sdp"
         android:background="@drawable/def_group_img"
         android:scaleType="centerCrop"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:riv_oval="true"
         />
-    
+
     <View
         android:id="@+id/view_supporter"
         android:layout_width="1dp"
         android:layout_height="1dp"
         app:layout_constraintBottom_toBottomOf="@+id/chat_image"
-        app:layout_constraintStart_toEndOf="@+id/chat_image"
+        app:layout_constraintEnd_toStartOf="@+id/chat_image"
         app:layout_constraintTop_toTopOf="@+id/chat_image"/>
 
     <TextView
@@ -34,13 +34,30 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="@color/light_blue"
-        android:textSize="@dimen/_26ssp"
-        android:gravity="center"
+        android:textSize="@dimen/_16ssp"
+        android:gravity="left"
         android:fontFamily="@font/chewyregular"
-        app:layout_constraintBottom_toTopOf="@+id/view_supporter"
-        app:layout_constraintStart_toEndOf="@+id/chat_image"
-        app:layout_constraintTop_toBottomOf="@+id/view_supporter"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/chat_image"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/view_supporter"
+        />
+
+    <TextView
+        android:id="@+id/event_last_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:layout_marginEnd="@dimen/_8sdp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/light_blue"
+        android:textSize="@dimen/_10ssp"
+        android:gravity="left"
+        android:fontFamily="@font/chewyregular"
+        app:layout_constraintTop_toBottomOf="@+id/event_name_text"
+        app:layout_constraintBottom_toBottomOf="@id/chat_image"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/view_supporter"
         />
 
 

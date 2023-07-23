@@ -37,6 +37,17 @@
         app:srcCompat="@drawable/baseline_add_circle_outline_24"
         app:tint="@color/primary_dark"/>
 
+    <!-- Add an error message TextView -->
+    <TextView
+        android:id="@+id/error_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/holo_red_dark"
+        android:visibility="gone" />
+
+
+
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_restart_button"
         android:layout_width="wrap_content"
