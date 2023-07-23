@@ -53,8 +53,8 @@ TextView greeting;
 FirebaseAuth mAuth;
 FirebaseUser currentUser;
 FirebaseFirestore db;
-String currentUserFirstName;
-String currentUserSurname;
+String currentUserFullName;
+
 HashMap<String,Event> events;
 User current;
 
@@ -109,9 +109,8 @@ User current;
             userDoc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    currentUserFirstName = task.getResult().getString("firstName");
-                    currentUserSurname = task.getResult().getString("surname");
-                    greeting.setText("Hello " + currentUserFirstName + " " + currentUserSurname + ", find what protest suits you!");
+                    currentUserFullName = task.getResult().getString("fullName");
+                    greeting.setText("Hello " + currentUserFullName + ", find what protest suits you!");
                 }
             });
 
@@ -130,12 +129,14 @@ User current;
         if (item.getItemId() == R.id.nav_maps) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MapFragment(events,current)).commit();
         } else if ( item.getItemId() == R.id.nav_chats){
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ChatsFragment(events,current)).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ChatsFragment(events, current)).commit();
         } else if (item.getItemId() == R.id.nav_logout) {
             mAuth.signOut();
             Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show();
             startActivities(new Intent[]{new Intent(getApplicationContext(), LoginActivity.class)});
             finish();
+        } else if (item.getItemId() == R.id.nav_about) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new AboutFragment()).commit();
         }
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;

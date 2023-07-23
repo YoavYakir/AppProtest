@@ -7,8 +7,10 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.example.approtest.databinding.ActivityChatBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -34,6 +36,9 @@ public class ChatActivity extends AppCompatActivity {
     private List<ChatMessage> chatMessages;
     private ChatAdapter chatAdapter;
     private FirebaseFirestore database;
+    private String conversationId = null;
+
+
 
 
 
@@ -60,7 +65,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void listenMessages(){
         database.collection(Constants.KEY_COLLECTION_CHAT)
-                .whereEqualTo(Constants.KEY_EVENT, event)
+                .whereEqualTo(Constants.KEY_EVENT_NAME, event.eventName)
                 .addSnapshotListener(eventListener);
     }
 
@@ -71,16 +76,9 @@ public class ChatActivity extends AppCompatActivity {
             int count = chatMessages.size();
             for(DocumentChange documentChange : value.getDocumentChanges()){
                 if(documentChange.getType() == DocumentChange.Type.ADDED) {
-//                    ChatMessage chatMessage = new ChatMessage();
-//                    chatMessage.sender = documentChange.getDocument().get(Constants.KEY_SENDER).toObject(User.class);
-//                    chatMessage.event = (Event) documentChange.getDocument().get(Constants.KEY_EVENT);
-//                    chatMessage.message = documentChange.getDocument().getString(Constants.KEY_MESSAGE);
-//                    chatMessage.dateObject = documentChange.getDocument().getDate(Constants.KEY_TIMESTAMP);
-//                    chatMessage.dateTime = getReadableDateTime(chatMessage.dateObject);
                     chatMessages.add(documentChange.getDocument().toObject(ChatMessage.class));
                     ChatMessage lastChatMessage = chatMessages.get(chatMessages.size() - 1);
                     lastChatMessage.dateTime = getReadableDateTime(lastChatMessage.dateObject);
-
                 }
             }
             Collections.sort(chatMessages, (obj1, obj2) -> obj1.dateObject.compareTo(obj2.dateObject));
@@ -93,6 +91,9 @@ public class ChatActivity extends AppCompatActivity {
             binding.chatRecyclerView.setVisibility(View.VISIBLE);
         }
         binding.progressBar.setVisibility(View.GONE);
+        if(conversationId == null){
+            checkForConversationsRemotely();
+        }
     };
 
     private void loadChatEventDetails(){
@@ -107,7 +108,18 @@ public class ChatActivity extends AppCompatActivity {
         message.put(Constants.KEY_EVENT, event);
         message.put(Constants.KEY_MESSAGE, binding.inputMessage.getText().toString());
         message.put(Constants.KEY_DATE_OBJECT, new Date());
+        message.put(Constants.KEY_EVENT_NAME, event.eventName);
         database.collection(Constants.KEY_COLLECTION_CHAT).add(message);
+        if(conversationId != null) {
+            updateConversation(binding.inputMessage.getText().toString());
+        } else {
+          HashMap<String, Object> conversation = new HashMap<>();
+          conversation.put(Constants.KEY_EVENT, event);
+          conversation.put(Constants.KEY_EVENT_NAME, event.eventName);
+          conversation.put(Constants.KEY_LAST_MESSAGE, binding.inputMessage.getText().toString());
+          conversation.put(Constants.KEY_DATE_OBJECT, new Date());
+          addConversation(conversation);
+        }
         binding.inputMessage.setText(null);
 
 
@@ -121,4 +133,33 @@ public class ChatActivity extends AppCompatActivity {
     private String getReadableDateTime(Date date){
         return new SimpleDateFormat("dd MMMM, yyyy - hh:mm a", Locale.getDefault()).format(date);
     }
+
+    private void addConversation(HashMap<String, Object> conversation){
+        database.collection(Constants.KEY_COLLECTION_CONVERSATIONS)
+                .add(conversation)
+                .addOnSuccessListener(documentReference -> conversationId = documentReference.getId());
+    }
+
+    private  void updateConversation(String message){
+        DocumentReference documentReference =
+                database.collection(Constants.KEY_COLLECTION_CONVERSATIONS).document(conversationId);
+        documentReference.update(
+                Constants.KEY_LAST_MESSAGE, message,
+                Constants.KEY_DATE_OBJECT, new Date()
+        );
+    }
+
+    private void checkForConversationsRemotely(){
+        database.collection(Constants.KEY_COLLECTION_CONVERSATIONS)
+                .whereEqualTo(Constants.KEY_EVENT_NAME, this.event.eventName)
+                .get()
+                .addOnCompleteListener(conversationOnCompleteListener);
+    }
+
+    private final OnCompleteListener<QuerySnapshot> conversationOnCompleteListener = task -> {
+        if (task.isSuccessful() && task.getResult() != null && task.getResult().getDocuments().size() > 0){
+            DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
+            conversationId = documentSnapshot.getId();
+        }
+    };
 }
