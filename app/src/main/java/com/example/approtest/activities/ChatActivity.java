@@ -1,4 +1,4 @@
-package com.example.approtest;
+package com.example.approtest.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -6,17 +6,19 @@ import android.os.Bundle;
 
 import android.view.View;
 
+import com.example.approtest.models.ChatMessage;
+import com.example.approtest.utilities.Constants;
+import com.example.approtest.models.Event;
+import com.example.approtest.models.User;
+import com.example.approtest.adapters.ChatAdapter;
 import com.example.approtest.databinding.ActivityChatBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.EventListener;
-
-import org.checkerframework.checker.units.qual.C;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

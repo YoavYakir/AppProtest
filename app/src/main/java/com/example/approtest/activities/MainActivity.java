@@ -1,48 +1,38 @@
-package com.example.approtest;
-
-import static android.content.ContentValues.TAG;
+package com.example.approtest.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
+
+import com.example.approtest.fragments.AboutFragment;
+import com.example.approtest.fragments.ChatsFragment;
+import com.example.approtest.models.Event;
+import com.example.approtest.fragments.MapFragment;
+import com.example.approtest.R;
+import com.example.approtest.models.User;
 
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Source;
 
-import java.sql.Array;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.prefs.Preferences;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -55,7 +45,7 @@ FirebaseUser currentUser;
 FirebaseFirestore db;
 String currentUserFullName;
 
-HashMap<String,Event> events;
+HashMap<String, Event> events;
 User current;
 
     private void updateCurrent()

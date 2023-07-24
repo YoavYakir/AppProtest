@@ -1,4 +1,4 @@
-package com.example.approtest;
+package com.example.approtest.models;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -8,16 +8,16 @@ import java.util.Map;
 
 
 public class Event implements Serializable {
-    protected String eventName;
-    protected HashMap<String,User> participants;
-    protected String date;
+    public String eventName;
+    public HashMap<String, User> participants;
+    public String date;
 //    protected ArrayList<Message> chat;
 
-    protected double latitude;
+    public double latitude;
 
-    protected double longitude;
+    public double longitude;
 
-    protected String encodedImage;
+    public String encodedImage;
 
     public Event (String eventName, String date, double latitude, double longitude, HashMap<String,User> participants, ArrayList<ChatMessage> chatMessages, String encodedImage){
         this(eventName,date, latitude, longitude,encodedImage);

@@ -1,4 +1,4 @@
-package com.example.approtest;
+package com.example.approtest.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,17 +9,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.approtest.utilities.ChatEventListener;
+import com.example.approtest.utilities.Constants;
+import com.example.approtest.activities.ChatActivity;
+import com.example.approtest.adapters.EventsAdapter;
+import com.example.approtest.adapters.RecentConversationAdapter;
 import com.example.approtest.databinding.FragmentChatsBinding;
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.EventListener;
+import com.example.approtest.models.ChatMessage;
+import com.example.approtest.models.Event;
+import com.example.approtest.models.User;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Queue;
 
 
 public class ChatsFragment extends Fragment implements ChatEventListener {

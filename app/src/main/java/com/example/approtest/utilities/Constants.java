@@ -1,4 +1,4 @@
-package com.example.approtest;
+package com.example.approtest.utilities;
 
 public class Constants {
     public static final String KEY_EVENT = "event";

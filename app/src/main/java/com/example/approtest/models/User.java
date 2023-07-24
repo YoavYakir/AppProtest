@@ -1,14 +1,8 @@
-package com.example.approtest;
+package com.example.approtest.models;
 
 import androidx.annotation.Nullable;
 
-import com.google.firebase.auth.FirebaseUser;
-
 import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class User implements Serializable{
     private String fullName;

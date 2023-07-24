@@ -1,4 +1,4 @@
-package com.example.approtest;
+package com.example.approtest.adapters;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.approtest.utilities.ChatEventListener;
+import com.example.approtest.models.Event;
 import com.example.approtest.databinding.ItemContainerEventChatBinding;
 
 import java.util.List;

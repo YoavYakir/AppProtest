@@ -16,17 +16,17 @@
         android:theme="@style/Theme.ApProtest"
         tools:targetApi="31">
         <activity
-            android:name=".ChatActivity"
+            android:name=".activities.ChatActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".NewEventActivity"
+            android:name=".activities.NewEventActivity"
             android:exported="false" />
         <activity
-            android:name=".RegisterActivity"
+            android:name=".activities.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".activities.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -39,7 +39,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyA5b_AYLZOgwkOQgJUOECBf_evh6-_LQbY" />
 
-        <activity android:name=".MainActivity" />
+        <activity android:name=".activities.MainActivity" />
     </application>
 
 </manifest>

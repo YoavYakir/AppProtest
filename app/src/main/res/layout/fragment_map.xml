@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/button_layout"
         android:layout_marginBottom="-68dp"
-        tools:context=".MapFragment" />
+        tools:context=".fragments.MapFragment" />
 
     <LinearLayout
         android:id="@+id/button_layout"

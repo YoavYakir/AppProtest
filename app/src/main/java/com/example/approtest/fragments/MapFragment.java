@@ -1,17 +1,12 @@
-package com.example.approtest;
+package com.example.approtest.fragments;
 
 import static android.content.ContentValues.TAG;
 
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.DialogFragment;
 import androidx.loader.content.Loader;
 
 import android.content.Intent;
@@ -23,30 +18,32 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
+
 import android.provider.MediaStore;
+
 import android.util.Base64;
+
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 import android.widget.Button;
 import android.widget.DatePicker;
+
+import com.example.approtest.R;
+import com.example.approtest.models.ClusterMarker;
+import com.example.approtest.models.Event;
+import com.example.approtest.models.User;
+import com.example.approtest.utilities.CustomClusterRenderer;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -62,13 +59,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserInfo;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.maps.android.clustering.ClusterManager;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -78,9 +75,8 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Locale;
-import android.app.DatePickerDialog;
+
 public class MapFragment extends Fragment {
     private boolean markerMoveEnabled = false;
     Boolean isAdmin;
@@ -91,15 +87,25 @@ public class MapFragment extends Fragment {
     private ViewGroup layoutContainer; // Container for the layout to be displayed
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
-    HashMap<String,Event> events;
+    HashMap<String, Event> events;
     FirebaseFirestore db;
     LatLng place;
 
     GoogleMap map;
 
+    private ClusterManager<ClusterMarker> mClusterManager;
+    private CustomClusterRenderer mClusterManagerRenderer;
+    private ArrayList<ClusterMarker> mClusterMarkers = new ArrayList<>();
     User current;
 
+
+
+
+
+
     Bitmap image;
+    private ClusterManager clusterManager;
+
 
     ImageView eventImage;
     protected HashMap<String, Marker> markers;
@@ -113,14 +119,13 @@ public class MapFragment extends Fragment {
 
     private void updateCurrent()
     {
-        Log.d("peeo", mAuth.getCurrentUser().getUid());
+
         DocumentReference docRef = db.collection("users").document(mAuth.getCurrentUser().getUid());
-        Log.d("peeo", "here213");
+
         docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 User user = documentSnapshot.toObject(User.class);
-                Log.d("peeo", user.getFullName());
                 current.setUser(user);
             }
         });
@@ -139,6 +144,8 @@ public class MapFragment extends Fragment {
             MarkerOptions markerOptions = new MarkerOptions().position(sydney).title("current");
             Marker tempMarker = googleMap.addMarker(markerOptions);
             tempMarker.setVisible(false);
+
+            addMapMarkers();
 
             googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                 @Override
@@ -190,6 +197,74 @@ public class MapFragment extends Fragment {
     };
 
 
+    private void addMapMarkers(){
+
+        if(map != null){
+
+            if(mClusterManager == null){
+                mClusterManager = new ClusterManager<ClusterMarker>(getActivity().getApplicationContext(), map);
+            }
+            if(mClusterManagerRenderer == null){
+                mClusterManagerRenderer = new CustomClusterRenderer(
+                        getActivity(),
+                        map,
+                        mClusterManager
+                );
+                mClusterManager.setRenderer(mClusterManagerRenderer);
+            }
+
+            for(Event event: events.values()){
+                try{
+                    ClusterMarker newClusterMarker = new ClusterMarker(
+                            new LatLng(event.latitude, event.longitude),
+                            event.eventName,
+                            event.date,
+                            event.encodedImage
+                    );
+                    mClusterManager.addItem(newClusterMarker);
+                    mClusterMarkers.add(newClusterMarker);
+
+                }catch (NullPointerException e){
+                    Log.e(TAG, "addMapMarkers: NullPointerException: " + e.getMessage() );
+                }
+
+            }
+            mClusterManager.cluster();
+        }
+    }
+
+
+    private void addMapMarker(Event event){
+
+        if(map != null){
+
+            if(mClusterManager == null){
+                mClusterManager = new ClusterManager<ClusterMarker>(getActivity().getApplicationContext(), map);
+            }
+            if(mClusterManagerRenderer == null){
+                mClusterManagerRenderer = new CustomClusterRenderer(
+                        getActivity(),
+                        map,
+                        mClusterManager
+                );
+                mClusterManager.setRenderer(mClusterManagerRenderer);
+            }
+            try{
+                ClusterMarker newClusterMarker = new ClusterMarker(
+                        new LatLng(event.latitude, event.longitude),
+                        event.eventName,
+                        event.date,
+                        event.encodedImage
+                );
+                mClusterManager.addItem(newClusterMarker);
+                mClusterMarkers.add(newClusterMarker);
+
+            }catch (NullPointerException e){
+                Log.e(TAG, "addMapMarkers: NullPointerException: " + e.getMessage() );
+            }
+            mClusterManager.cluster();
+        }
+    }
 //    private void buildDialog (String markerTitle) {
 //        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 //        builder.setTitle(markerTitle);
@@ -367,10 +442,16 @@ public class MapFragment extends Fragment {
                         String name = event.getEventName();
                         String im = document.toObject(Event.class).getEncodedImage();
                         MarkerOptions markerOptions = new MarkerOptions().position(pos).title(name);
+
+                        // if (event.hasUser(current)){markerOptions
+                        //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));}
+                        markerOptions.icon(createDescriptor(i));
+
                         event.setEncodedImage(im);
                         // if (event.hasUser(current)){markerOptions
                         //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));}
                         markerOptions.icon(createDescriptor(String.valueOf(im)));
+
                         Marker eventMarker = map.addMarker(markerOptions);
                         markers.put(event.getEventName(),eventMarker);
                     }
@@ -381,6 +462,23 @@ public class MapFragment extends Fragment {
         });
     }
 
+
+
+    public BitmapDescriptor createDescriptor(int i)
+    {
+        ImageView view = (ImageView)getView().findViewById(R.id.markerImage);
+        if (i == 1){
+            view.setImageResource(R.drawable.blueskys);}
+        else
+        {
+            view.setImageResource(R.drawable.def_group_img);
+        }
+        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
 
     public BitmapDescriptor createDescriptor(String im)
     {
@@ -399,6 +497,7 @@ public class MapFragment extends Fragment {
         Matrix matrix = new Matrix();
         // RESIZE THE BIT MAP
         matrix.postScale(scaleWidth, scaleHeight);
+
 
         // "RECREATE" THE NEW BITMAP
         Bitmap resizedBitmap = Bitmap.createBitmap(
@@ -465,9 +564,15 @@ public class MapFragment extends Fragment {
 
         eventImage = new ImageView(getActivity());
         eventImage.setImageResource(R.drawable.def_group_img);
+
+        eventImage.setLayoutParams(new LinearLayout.LayoutParams(200, 200));
+        layout.addView(eventImage);
+
+
         image = ((BitmapDrawable)eventImage.getDrawable()).getBitmap();
 
-        layout.addView(eventImage);
+//        layout.addView(eventImage);
+
         Button attachButton = new Button(getActivity());
         attachButton.setText("Attach Picture");
         attachButton.setLayoutParams(new LinearLayout.LayoutParams(100, 50));
@@ -568,6 +673,9 @@ public class MapFragment extends Fragment {
             String picturePath = cursor.getString(columnIndex);
             cursor.close();
             Log.d("pohashit", picturePath);
+            eventImage.setMaxHeight(10);
+            eventImage.setMaxWidth(10);
+            eventImage.setImageBitmap(BitmapFactory.decodeFile(picturePath));
             image = BitmapFactory.decodeFile(picturePath);
             eventImage.setImageBitmap(image);
         }

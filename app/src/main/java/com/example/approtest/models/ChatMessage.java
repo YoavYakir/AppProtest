@@ -1,4 +1,7 @@
-package com.example.approtest;
+package com.example.approtest.models;
+
+import com.example.approtest.models.Event;
+import com.example.approtest.models.User;
 
 import java.util.Date;
 

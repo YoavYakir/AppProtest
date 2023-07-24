@@ -1,4 +1,4 @@
-package com.example.approtest;
+package com.example.approtest.adapters;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -7,10 +7,10 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.approtest.databinding.ItemContainerEventChatBinding;
+import com.example.approtest.models.ChatMessage;
+import com.example.approtest.models.User;
 import com.example.approtest.databinding.ItemContainerReceivedMessageBinding;
 import com.example.approtest.databinding.ItemContainerSentMessageBinding;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
