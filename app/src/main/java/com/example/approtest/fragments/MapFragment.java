@@ -18,6 +18,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -44,6 +48,7 @@ import com.example.approtest.models.User;
 import com.example.approtest.utilities.CustomClusterRenderer;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -163,6 +168,7 @@ public class MapFragment extends Fragment {
                     }
                 }
             });
+
             googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker) {
@@ -441,23 +447,15 @@ public class MapFragment extends Fragment {
                         LatLng pos = new LatLng(event.getLatitude(), event.getLongitude());
                         String name = event.getEventName();
                         String im = document.toObject(Event.class).getEncodedImage();
-                        MarkerOptions markerOptions = new MarkerOptions().position(pos).title(name);
-
-                        // if (event.hasUser(current)){markerOptions
-                        //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));}
-                        markerOptions.icon(createDescriptor(i));
-
                         event.setEncodedImage(im);
-                        // if (event.hasUser(current)){markerOptions
-                        //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));}
+                        MarkerOptions markerOptions = new MarkerOptions().position(pos).title(name);
                         markerOptions.icon(createDescriptor(String.valueOf(im)));
-
-                        Marker eventMarker = map.addMarker(markerOptions);
-                        markers.put(event.getEventName(),eventMarker);
+                        map.addMarker(markerOptions);
                     }
                 } else {
                     Log.d(TAG, "Error getting documents: ", task.getException());
                 }
+
             }
         });
     }
@@ -478,6 +476,28 @@ public class MapFragment extends Fragment {
         view.draw(canvas);
 
         return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+    public Bitmap getCroppedBitmap(Bitmap bitmap) {
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+
+        final int color = 0xff424242;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        // canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+        canvas.drawCircle(bitmap.getWidth() / 2, bitmap.getHeight() / 2,
+                bitmap.getWidth() / 2, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+        //Bitmap _bmp = Bitmap.createScaledBitmap(output, 60, 60, false);
+        //return _bmp;
+        return output;
     }
 
     public BitmapDescriptor createDescriptor(String im)
@@ -528,7 +548,7 @@ public class MapFragment extends Fragment {
         String encodedImage = StringConvert(image);
         Event event = new Event(name,date,latitude,longitude,encodedImage);
         event.addUser(current);
-        Log.d("shitpit", event.getParticipants().get(current.getToken()).getToken());
+        Log.d("shitpit", event.getEncodedImage());
         DocumentReference documentReference = db.collection("events").document(name);
         documentReference.set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
@@ -677,6 +697,8 @@ public class MapFragment extends Fragment {
             eventImage.setMaxWidth(10);
             eventImage.setImageBitmap(BitmapFactory.decodeFile(picturePath));
             image = BitmapFactory.decodeFile(picturePath);
+            image = getResizedBitmap(image,100,100);
+            image = getCroppedBitmap(image);
             eventImage.setImageBitmap(image);
         }
     }
