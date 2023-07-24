@@ -38,7 +38,7 @@ public class ChatsFragment extends Fragment implements ChatEventListener {
 
     private FirebaseFirestore database;
 
-
+    // Constructor to pass data to the fragment
     public ChatsFragment(HashMap<String, Event> events, User current) {
         this.events = events;
         this.current = current;
@@ -66,7 +66,7 @@ public class ChatsFragment extends Fragment implements ChatEventListener {
                              Bundle savedInstanceState) {
         return binding.getRoot();
     }
-
+    // Fetch the current events that the user is part of and display them
     private void getCurrentEvents() {
         loading(true);
         ArrayList<Event> currentEvents = new ArrayList<Event>();
@@ -85,7 +85,7 @@ public class ChatsFragment extends Fragment implements ChatEventListener {
         }
     }
 
-
+    // Show or hide the loading progress bar
     private void loading(boolean isLoading) {
         if (isLoading){
             binding.chatsProgressBar.setVisibility(View.VISIBLE);
@@ -94,14 +94,14 @@ public class ChatsFragment extends Fragment implements ChatEventListener {
         }
     }
 
-
+    // Show an error message when no events are available
     private void showErrorMessage(){
         binding.textErrorMessage.setText(String.format("%s", "Events are unavailiable"));
         binding.textErrorMessage.setVisibility(View.VISIBLE);
 
     }
 
-
+    // Handle click event for a specific chat event, navigate to ChatActivity
     @Override
     public void onChatEventClicked(Event event) {
         Intent intent = new Intent(getActivity().getApplicationContext(), ChatActivity.class);

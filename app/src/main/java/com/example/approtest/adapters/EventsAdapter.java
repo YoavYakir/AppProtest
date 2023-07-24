@@ -20,13 +20,13 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
     private final List<Event> events;
 
     private final ChatEventListener chatEventListener;
-
+    // Constructor to initialize the EventsAdapter with a list of events and a ChatEventListener
     public EventsAdapter(List<Event> events, ChatEventListener chatEventListener) {
         this.events = events;
         this.chatEventListener = chatEventListener;
     }
 
-
+    // Create a new EventViewHolder by inflating the layout for each item in the RecyclerView
     @NonNull
     @Override
     public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -49,6 +49,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
         return events.size();
     }
 
+    // ViewHolder class to hold references to the views for each item in the RecyclerView
     class EventViewHolder extends RecyclerView.ViewHolder {
 
         ItemContainerEventChatBinding binding;
@@ -57,7 +58,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
             super(itemContainerGroupBinding.getRoot());
             binding = itemContainerGroupBinding;
         }
-
+        // Set the data for the event and bind it to the views
         void setEventData(Event event){
             binding.eventNameText.setText(event.eventName);
             binding.chatImage.setImageBitmap(getEventImage(event.encodedImage));
@@ -66,7 +67,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
 
 
     }
-
+    // Helper method to convert encoded image string to a Bitmap
     private Bitmap getEventImage(String encodedImage){
         byte[] bytes = Base64.decode(encodedImage, Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);

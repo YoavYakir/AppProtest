@@ -40,6 +40,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.TimePicker;
+
 
 import com.example.approtest.R;
 import com.example.approtest.models.ClusterMarker;
@@ -82,11 +84,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+/*
+ * This class is responsible on building the MapFragment which will
+ * Manage the protests that are happening and place them geographically.
+ * Most of the functionality will also take place here.
+ * */
+
 public class MapFragment extends Fragment {
+    // data members
     private boolean markerMoveEnabled = false;
     Boolean isAdmin;
     private static int RESULT_LOAD_IMAGE = 1;
-
     public static int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE =1;
 
     private ViewGroup layoutContainer; // Container for the layout to be displayed
@@ -95,19 +103,11 @@ public class MapFragment extends Fragment {
     HashMap<String, Event> events;
     FirebaseFirestore db;
     LatLng place;
-
     GoogleMap map;
-
     private ClusterManager<ClusterMarker> mClusterManager;
     private CustomClusterRenderer mClusterManagerRenderer;
     private ArrayList<ClusterMarker> mClusterMarkers = new ArrayList<>();
     User current;
-
-
-
-
-
-
     Bitmap image;
     private ClusterManager clusterManager;
 
@@ -116,22 +116,22 @@ public class MapFragment extends Fragment {
     protected HashMap<String, Marker> markers;
     public MapFragment(HashMap<String,Event> events, User current)
     {
+        // init
         this.events = events;
         this.current = current;
-        Log.d("onsucc", current.getFullName()+current.getEmail()+current.getToken());
         place = new LatLng(0,0);
     }
-
+    //    this method updates the current user and builds it into a User Object
     private void updateCurrent()
     {
 
-        DocumentReference docRef = db.collection("users").document(mAuth.getCurrentUser().getUid());
+        DocumentReference docRef = db.collection("users").document(mAuth.getCurrentUser().getUid()); // access db
 
         docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 User user = documentSnapshot.toObject(User.class);
-                current.setUser(user);
+                current.setUser(user); //set current user
             }
         });
     }
@@ -146,21 +146,21 @@ public class MapFragment extends Fragment {
             markers = new HashMap<String,Marker>();
             LatLng sydney = new LatLng(31, 35);
             googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-            MarkerOptions markerOptions = new MarkerOptions().position(sydney).title("current");
+            MarkerOptions markerOptions = new MarkerOptions().position(sydney).title("current"); // init marker place
             Marker tempMarker = googleMap.addMarker(markerOptions);
             tempMarker.setVisible(false);
 
-            addMapMarkers();
 
+            //Upon clicking on the map
             googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                 @Override
                 public void onMapClick(LatLng latLng)
                 {
                     if (markerMoveEnabled) {
-                        place =new LatLng(latLng.latitude,latLng.longitude);
+                        place =new LatLng(latLng.latitude,latLng.longitude); // set a marker
                         tempMarker.setVisible(true);
                         tempMarker.setPosition(latLng);
-                        showDialog(tempMarker,false);
+                        showDialog(tempMarker,0);
                     }
                     else
                     {
@@ -203,119 +203,9 @@ public class MapFragment extends Fragment {
     };
 
 
-    private void addMapMarkers(){
-
-        if(map != null){
-
-            if(mClusterManager == null){
-                mClusterManager = new ClusterManager<ClusterMarker>(getActivity().getApplicationContext(), map);
-            }
-            if(mClusterManagerRenderer == null){
-                mClusterManagerRenderer = new CustomClusterRenderer(
-                        getActivity(),
-                        map,
-                        mClusterManager
-                );
-                mClusterManager.setRenderer(mClusterManagerRenderer);
-            }
-
-            for(Event event: events.values()){
-                try{
-                    ClusterMarker newClusterMarker = new ClusterMarker(
-                            new LatLng(event.latitude, event.longitude),
-                            event.eventName,
-                            event.date,
-                            event.encodedImage
-                    );
-                    mClusterManager.addItem(newClusterMarker);
-                    mClusterMarkers.add(newClusterMarker);
-
-                }catch (NullPointerException e){
-                    Log.e(TAG, "addMapMarkers: NullPointerException: " + e.getMessage() );
-                }
-
-            }
-            mClusterManager.cluster();
-        }
-    }
-
-
-    private void addMapMarker(Event event){
-
-        if(map != null){
-
-            if(mClusterManager == null){
-                mClusterManager = new ClusterManager<ClusterMarker>(getActivity().getApplicationContext(), map);
-            }
-            if(mClusterManagerRenderer == null){
-                mClusterManagerRenderer = new CustomClusterRenderer(
-                        getActivity(),
-                        map,
-                        mClusterManager
-                );
-                mClusterManager.setRenderer(mClusterManagerRenderer);
-            }
-            try{
-                ClusterMarker newClusterMarker = new ClusterMarker(
-                        new LatLng(event.latitude, event.longitude),
-                        event.eventName,
-                        event.date,
-                        event.encodedImage
-                );
-                mClusterManager.addItem(newClusterMarker);
-                mClusterMarkers.add(newClusterMarker);
-
-            }catch (NullPointerException e){
-                Log.e(TAG, "addMapMarkers: NullPointerException: " + e.getMessage() );
-            }
-            mClusterManager.cluster();
-        }
-    }
-//    private void buildDialog (String markerTitle) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//        builder.setTitle(markerTitle);
-//        builder.setMessage(markerTitle);
-//        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                dialog.dismiss();
-//            }
-//        });
-//        // build negativeButton
-//
-//        return;
-//    }
-
-    private boolean checkParticipatingFromDB(String eveName,User curr){
-        DocumentReference documentReference = db.collection("events").document(eveName);
-        final boolean flag[] = {false};
-        documentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                Event tempEve = documentSnapshot.toObject(Event.class);
-                Log.d("onsucc", "succ");
-                flag[0] = tempEve.hasUser(current);
-            }
-        });
-        return flag[0];
-    }
-
     private boolean checkParticipating(String eveName,User curr){
         return events.get(eveName).hasUser(curr);
     }
-
-    /*private void constructNegativeButton(boolean participating){
-        if (participating){
-            builder.setNegativeButton("Unsubscribe From Event", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    // Delete event
-                    dialog.dismiss();
-                }
-            });
-        }
-    } */
-
 
 
     private void showDialogWithMarkerTitle(String markerTitle) {
@@ -329,7 +219,6 @@ public class MapFragment extends Fragment {
                 dialog.dismiss();
             }
         });
-        Log.d("bool check", String.valueOf(checkParticipating(markerTitle,current))); // check
         if (checkParticipating(markerTitle,current)) {
             builder.setNegativeButton("Unsubscribe From Event", new DialogInterface.OnClickListener() {
                 @Override
@@ -371,6 +260,7 @@ public class MapFragment extends Fragment {
         eventImage = new ImageView(getActivity());
         DocumentReference userDoc = db.collection("users").document(currentUser.getUid());
         userDoc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            // check if user id admin, if yes then display add event button
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
@@ -394,30 +284,20 @@ public class MapFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 updateEvents();
-                //Intent intent = new Intent(getActivity(), NewEventActivity.class);
-                //startActivity(intent);
             }
         });
 
 
         add_button_floating.setOnClickListener(new View.OnClickListener() {
             @Override
+            // display/dont display marker if user is admin/ not admin accordingly
             public void onClick(View v) {
                 markerMoveEnabled=!markerMoveEnabled;
-                //Intent intent = new Intent(getActivity(), NewEventActivity.class);
-                //startActivity(intent);
             }
         });
         return rootView;
 
     }
-
-    /*rivate BitmapDescriptor getCustomMarkerIcon(int color) {
-        Drawable background = ContextCompat.getDrawable(getContext(), R.drawable.ic_custom_marker);
-        background.setColorFilter(color, PorterDuff.Mode.SRC_IN);
-        BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(((BitmapDrawable) background).getBitmap());
-        return bitmapDescriptor;
-    }*/
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -429,7 +309,7 @@ public class MapFragment extends Fragment {
         }
     }
 
-
+// update Event list
     public void updateEvents()
     {
         int i = 1;
@@ -442,7 +322,6 @@ public class MapFragment extends Fragment {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Event event = new Event(document.toObject(Event.class));
-                        Log.d("pozenim", String.valueOf(document.toObject(Event.class).getEncodedImage()));
                         events.put(event.getEventName(),event);
                         LatLng pos = new LatLng(event.getLatitude(), event.getLongitude());
                         String name = event.getEventName();
@@ -461,7 +340,7 @@ public class MapFragment extends Fragment {
     }
 
 
-
+// used for displaying images on map and when creating new events
     public BitmapDescriptor createDescriptor(int i)
     {
         ImageView view = (ImageView)getView().findViewById(R.id.markerImage);
@@ -495,8 +374,6 @@ public class MapFragment extends Fragment {
                 bitmap.getWidth() / 2, paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, rect, rect, paint);
-        //Bitmap _bmp = Bitmap.createScaledBitmap(output, 60, 60, false);
-        //return _bmp;
         return output;
     }
 
@@ -532,8 +409,6 @@ public class MapFragment extends Fragment {
         documentReference.set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
-
-                Log.d("peepeepoopoo", "here2");
                 updateEvents();
             }
         });
@@ -542,25 +417,22 @@ public class MapFragment extends Fragment {
 
     private void saveEvent(String name, String date, LatLng place)
     {
-        Log.d("shitpit", current.getToken());
         double latitude = place.latitude;
         double longitude = place.longitude;
         String encodedImage = StringConvert(image);
         Event event = new Event(name,date,latitude,longitude,encodedImage);
         event.addUser(current);
-        Log.d("shitpit", event.getEncodedImage());
         DocumentReference documentReference = db.collection("events").document(name);
         documentReference.set(event).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
-                Log.d("peepeepoopoo", "here2");
                 updateEvents();
             }
         });
     }
 
-
-    private void showDialog(Marker tempMarker, boolean fieldError) {
+    // show description of event
+    private void showDialog(Marker tempMarker, int fieldErrorStatus) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Add Event");
 
@@ -570,12 +442,6 @@ public class MapFragment extends Fragment {
         final EditText eventN = new EditText(getActivity());
         eventN.setHint("Event Name");
         layout.addView(eventN);
-
-        /* old text form:
-        final EditText eventD = new EditText(getActivity());
-        eventD.setHint("Date");
-        layout.addView(eventD);
-         */
 
         TextView errorMessage = new TextView(getActivity());
         errorMessage.setTextColor(ContextCompat.getColor(getActivity(), android.R.color.holo_red_dark));
@@ -591,8 +457,6 @@ public class MapFragment extends Fragment {
 
         image = ((BitmapDrawable)eventImage.getDrawable()).getBitmap();
 
-//        layout.addView(eventImage);
-
         Button attachButton = new Button(getActivity());
         attachButton.setText("Attach Picture");
         attachButton.setLayoutParams(new LinearLayout.LayoutParams(100, 50));
@@ -601,6 +465,7 @@ public class MapFragment extends Fragment {
         attachButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
+            // request permission to access gallery (Media permission)
             public void onClick(View arg0) {
 
 
@@ -608,12 +473,11 @@ public class MapFragment extends Fragment {
                         android.Manifest.permission.READ_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED) {
                     // Permission is not granted, request the permission
-                    Log.d("please","please");
+
 
                     ActivityCompat.requestPermissions(requireActivity(),
                             new String[]{android.Manifest.permission.READ_MEDIA_IMAGES},
                             MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-                    Log.d("aaa","aaa");
                     requestPermissions(new String[]{android.Manifest.permission.READ_MEDIA_IMAGES},
                             MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
                 } else {
@@ -631,16 +495,31 @@ public class MapFragment extends Fragment {
         });
 
 
-
+    // event must have a unique name
         final DatePicker datePicker = new DatePicker(getActivity());
         layout.addView(datePicker);
+
         builder.setView(layout);
 
-        if (fieldError){
+        if (fieldErrorStatus == 0){
+            Log.d("dialog error","no error!");
+        }
+
+        if (fieldErrorStatus == 1){
             errorMessage.setText("Please make sure inputs are not empty!");
             errorMessage.setVisibility(View.VISIBLE);
         }
 
+        else if(fieldErrorStatus == 2){
+            errorMessage.setText("Please choose a unique event name!");
+            errorMessage.setVisibility(View.VISIBLE);
+        }
+
+        else {
+            Log.d("unknown error code","code unknown");
+        }
+
+        // display a calendar when creating a new event
         builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -653,10 +532,14 @@ public class MapFragment extends Fragment {
                 // Convert the selected date to the desired format (dd/MM/yyyy)
                 String formattedDate = String.format(Locale.getDefault(), "%02d/%02d/%04d", day, month, year);
 
+
                 if (name.isEmpty() || formattedDate.isEmpty()){
                     Log.d("error message should occur!", "error message");
-                    showDialog(tempMarker, true);
+                    showDialog(tempMarker, 1);
 
+                }
+                else if (events.containsKey(name)) {
+                    showDialog(tempMarker, 2);
                 }
                 else {
                     saveEvent(name, formattedDate, place);
@@ -692,7 +575,6 @@ public class MapFragment extends Fragment {
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
             String picturePath = cursor.getString(columnIndex);
             cursor.close();
-            Log.d("pohashit", picturePath);
             eventImage.setMaxHeight(10);
             eventImage.setMaxWidth(10);
             eventImage.setImageBitmap(BitmapFactory.decodeFile(picturePath));

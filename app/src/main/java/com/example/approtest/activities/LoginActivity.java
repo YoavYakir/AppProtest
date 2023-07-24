@@ -72,7 +72,8 @@ public class LoginActivity extends AppCompatActivity {
                 String email = String.valueOf(editTextEmail.getText()).trim();
                 String password = String.valueOf(editTextPassword.getText()).trim();
 
-
+                // request email and password until both are provided
+                // the email and password must be in the database (registered user)
                 if (email.isEmpty() || password.isEmpty()) {
                     if (TextUtils.isEmpty(email)) {
                         editTextEmail.setError("Email is required");
@@ -88,7 +89,6 @@ public class LoginActivity extends AppCompatActivity {
 
                     Toast.makeText(LoginActivity.this, "Invalid credentials", Toast.LENGTH_SHORT).show();
                 }
-
                 mAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override

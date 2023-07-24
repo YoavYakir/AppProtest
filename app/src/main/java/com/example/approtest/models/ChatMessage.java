@@ -4,6 +4,7 @@ import com.example.approtest.models.Event;
 import com.example.approtest.models.User;
 
 import java.util.Date;
+// Chat message class
 
 public class ChatMessage {
 

@@ -3,7 +3,7 @@ package com.example.approtest.models;
 import androidx.annotation.Nullable;
 
 import java.io.Serializable;
-
+// user class
 public class User implements Serializable{
     private String fullName;
     private String token;
@@ -36,21 +36,9 @@ public class User implements Serializable{
 
     public String getFullName() {return fullName;}
 
-    /*public ArrayList<String> getUserEvents() {
-        ArrayList<String> events = new ArrayList<String>();
-        for (int i = 0;i < userEvents.size();i++) {
-            this.userEvents.add(String.valueOf(userEvents.get(i)));
-        }
-        return events;
-    }*/
     public String getEmail(){return email;}
 
     public boolean getAdmin(){return admin;}
-
-    /*public void addEvent(Event event)
-    {
-        userEvents.add(String.valueOf(event.eventName));
-    }*/
 
     public void setUser(User user)
     {

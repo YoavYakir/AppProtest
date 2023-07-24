@@ -4,9 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-//import com.google.
 
-
+// event class
 public class Event implements Serializable {
     public String eventName;
     public HashMap<String, User> participants;
@@ -25,11 +24,6 @@ public class Event implements Serializable {
         {
             this.participants.put(entry.getKey(),entry.getValue()) ;
         }
-//        for(int i=0 ;i  < chat.size();i++)
-//        {
-//            this.chat.add(chat.get(i));
-//        }
-
     }
 
     public Event (String eventName, String date, double latitude, double longitude,String encodedImage){
@@ -39,7 +33,6 @@ public class Event implements Serializable {
         this.longitude = longitude;
         this.participants = new HashMap<String,User>();
         this.encodedImage = String.valueOf(encodedImage);
-//        this.chat = new ArrayList<ChatMessage>();
     }
 
 
@@ -55,7 +48,6 @@ public class Event implements Serializable {
     public Event()
     {
         this.participants = new HashMap<String,User>();
-//        this.chat = new ArrayList<ChatMessage>();
     }
 
     public void setEncodedImage(String encodedImage)
@@ -89,14 +81,6 @@ public class Event implements Serializable {
         return users;
     }
 
-//    public ArrayList<ChatMessage> getChat() {
-//        ArrayList<ChatMessage> chat = new ArrayList<ChatMessage>();
-//        for(int i = 0; i < this.chat.size();i++)
-//        {
-//            chat.add(new ChatMessage(this.chat.get(i)));
-//        }
-//        return chat;
-//    }
 
     public void addUser(User user) {this.participants.put(user.getToken(),new User(user)); }
 

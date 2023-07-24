@@ -27,6 +27,7 @@ public class CustomClusterRenderer extends DefaultClusterRenderer<ClusterMarker>
     private final int markerWidth;
     private final int markerHeight;
 
+    // Constructor for the CustomClusterRenderer class
     public CustomClusterRenderer(Context context, GoogleMap map, ClusterManager<ClusterMarker> clusterManager) {
 
         super(context, map, clusterManager);
@@ -39,7 +40,7 @@ public class CustomClusterRenderer extends DefaultClusterRenderer<ClusterMarker>
         imageView.setPadding(padding, padding, padding, padding);
         iconGenerator.setContentView(imageView);
     }
-
+    // Method is called before rendering a cluster item
     @Override
     protected void onBeforeClusterItemRendered(@NonNull ClusterMarker item, @NonNull MarkerOptions markerOptions) {
         byte[] decodeStingImage = Base64.decode(item.getIconPicture(), Base64.DEFAULT);

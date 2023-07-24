@@ -23,7 +23,7 @@ public class RecentConversationAdapter extends RecyclerView.Adapter<RecentConver
         this.chatMessages = chatMessages;
     }
 
-
+    // Create a new ViewHolder instance by inflating the layout for each item in the RecyclerView
     @NonNull
     @Override
     public conversationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -36,6 +36,7 @@ public class RecentConversationAdapter extends RecyclerView.Adapter<RecentConver
         );
     }
 
+    // Bind data to the ViewHolder at the given position
     @Override
     public void onBindViewHolder(@NonNull conversationViewHolder holder, int position) {
         holder.setData(chatMessages.get(position));
@@ -47,13 +48,16 @@ public class RecentConversationAdapter extends RecyclerView.Adapter<RecentConver
         return chatMessages.size();
     }
 
+    // ViewHolder class to hold and manage the individual views for each item in the RecyclerView
     class conversationViewHolder extends RecyclerView.ViewHolder {
         ItemContainerEventChatBinding binding;
         conversationViewHolder(ItemContainerEventChatBinding itemContainerEventChatBinding) {
             super(itemContainerEventChatBinding.getRoot());
             binding = itemContainerEventChatBinding;
+
         }
 
+        // Method to set data to the views inside the ViewHolder using a ChatMessage object
         void setData(ChatMessage chatMessage) {
             binding.chatImage.setImageBitmap(getconversationImage(chatMessage.event.encodedImage));
             binding.eventNameText.setText(chatMessage.event.eventName);

@@ -41,9 +41,7 @@ public class ChatActivity extends AppCompatActivity {
     private String conversationId = null;
 
 
-
-
-
+    // Inflate the layout and set it as the activity's content view
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +53,7 @@ public class ChatActivity extends AppCompatActivity {
         listenMessages();
     }
 
+    // Initialize the chatMessages list and chatAdapter
     private void init() {
         chatMessages = new ArrayList<>();
         chatAdapter = new ChatAdapter(
@@ -64,13 +63,13 @@ public class ChatActivity extends AppCompatActivity {
         binding.chatRecyclerView.setAdapter(chatAdapter);
         database = FirebaseFirestore.getInstance();
     }
-
+    // Listen for new chat messages in the Firestore database
     private void listenMessages(){
         database.collection(Constants.KEY_COLLECTION_CHAT)
                 .whereEqualTo(Constants.KEY_EVENT_NAME, event.eventName)
                 .addSnapshotListener(eventListener);
     }
-
+    // Updates chatMessages list with new messages, sorts them by date
     private final EventListener<QuerySnapshot> eventListener = (value, error) -> {
         if (error != null){
             return;
@@ -97,13 +96,14 @@ public class ChatActivity extends AppCompatActivity {
             checkForConversationsRemotely();
         }
     };
-
+    // Retrieve event and current user data passed from the previous activity
+    // Set chat title with event name
     private void loadChatEventDetails(){
         event = (Event) getIntent().getSerializableExtra(Constants.KEY_EVENT);
         current = (User) getIntent().getSerializableExtra(Constants.KEY_CURRENT_USER);
         binding.chatTitle.setText(event.eventName);
     }
-
+    // Send a new message to database
     private void sendMessage() {
         HashMap<String, Object> message = new HashMap<>();
         message.put(Constants.KEY_SENDER, current);
@@ -126,22 +126,23 @@ public class ChatActivity extends AppCompatActivity {
 
 
     }
-
+    // click listeners for the back button and the send message button
     private void setListeners(){
         binding.chatImageBack.setOnClickListener(v -> onBackPressed());
         binding.layoutSend.setOnClickListener(v -> sendMessage());
     }
-
+    // Format the given date to DD//MM/YYYY hh:mm format
     private String getReadableDateTime(Date date){
         return new SimpleDateFormat("dd MMMM, yyyy - hh:mm a", Locale.getDefault()).format(date);
     }
 
+    // Add new conversation document to the database
     private void addConversation(HashMap<String, Object> conversation){
         database.collection(Constants.KEY_COLLECTION_CONVERSATIONS)
                 .add(conversation)
                 .addOnSuccessListener(documentReference -> conversationId = documentReference.getId());
     }
-
+    // Update an existing conversation document in the database
     private  void updateConversation(String message){
         DocumentReference documentReference =
                 database.collection(Constants.KEY_COLLECTION_CONVERSATIONS).document(conversationId);
@@ -150,7 +151,7 @@ public class ChatActivity extends AppCompatActivity {
                 Constants.KEY_DATE_OBJECT, new Date()
         );
     }
-
+    // Checks if conversations exist in the database
     private void checkForConversationsRemotely(){
         database.collection(Constants.KEY_COLLECTION_CONVERSATIONS)
                 .whereEqualTo(Constants.KEY_EVENT_NAME, this.event.eventName)

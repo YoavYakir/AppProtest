@@ -5,7 +5,7 @@ import androidx.annotation.Nullable;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
-
+// Marker class
 public class ClusterMarker implements ClusterItem {
 
     private LatLng position;
@@ -13,14 +13,12 @@ public class ClusterMarker implements ClusterItem {
     private String snippet;
 
     private String iconPicture;
-//    private Event event;
 
     public ClusterMarker(LatLng position, String title, String snippet, String iconPicture) {
         this.position = position;
         this.title = title;
         this.snippet = snippet;
         this.iconPicture = iconPicture;
-//        this.event = event;
     }
 
     public ClusterMarker() {

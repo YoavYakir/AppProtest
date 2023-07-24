@@ -36,33 +36,31 @@ import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-private DrawerLayout drawerLayout;
-Toolbar toolbar;
-NavigationView navigationView;
-TextView greeting;
-FirebaseAuth mAuth;
-FirebaseUser currentUser;
-FirebaseFirestore db;
-String currentUserFullName;
+    private DrawerLayout drawerLayout;
+    Toolbar toolbar;
+    NavigationView navigationView;
+    TextView greeting;
+    FirebaseAuth mAuth;
+    FirebaseUser currentUser;
+    FirebaseFirestore db;
+    String currentUserFullName;
 
-HashMap<String, Event> events;
-User current;
-
+    HashMap<String, Event> events;
+    User current;
+    // Method to update the current user's information from database
     private void updateCurrent()
     {
-        Log.d("amithabulbul", mAuth.getCurrentUser().getUid());
         DocumentReference docRef = db.collection("users").document(currentUser.getUid());
-        Log.d("amithabulbul", docRef.toString());
         docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 User user = documentSnapshot.toObject(User.class);
-                Log.d("amithabulbul", "here");
                 current.setUser(user);
             }
         });
     }
 
+    // onCreate method to initialize the activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,11 +89,12 @@ User current;
         db = FirebaseFirestore.getInstance();
 
         DocumentReference userDoc = db.collection("users").document(currentUser.getUid());
-       updateCurrent();
+        updateCurrent();
         if (currentUser == null) {
             startActivities(new Intent[]{new Intent(getApplicationContext(), LoginActivity.class)});
             finish();
         } else {
+            // display on top the name of the current user
             userDoc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -113,7 +112,7 @@ User current;
 
 
 
-
+    // Method to handle navigation item selection in the navigation menu
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.nav_maps) {

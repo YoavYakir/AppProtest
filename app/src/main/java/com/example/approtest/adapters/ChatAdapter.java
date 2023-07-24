@@ -1,5 +1,4 @@
 package com.example.approtest.adapters;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -26,11 +25,14 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         this.sender = sender;
     }
 
+
+    // Inflate the appropriate layout based on the view type
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         switch (viewType){
             case VIEW_TYPE_SENT:
+                // For sent messages, inflate the SentMessageViewHolder layout
                 return new SentMessageViewHolder(
                         ItemContainerSentMessageBinding.inflate(
                                 LayoutInflater.from(parent.getContext()),
@@ -39,6 +41,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
                         )
                 );
             case VIEW_TYPE_RECEIVED:
+                // For received messages, inflate the ReceivedMessageViewHolder layout
                 return new ReceivedMessageViewHolder(
                         ItemContainerReceivedMessageBinding.inflate(
                                 LayoutInflater.from(parent.getContext()),
@@ -53,6 +56,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         return null;
     }
 
+    // Bind data to the views based on the view type of the item at the given position
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         switch (getItemViewType(position)) {
@@ -69,11 +73,14 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     }
 
+    // Return the number of chat messages in the list
     @Override
     public int getItemCount() {
         return chatMessages.size();
     }
 
+
+    // Determine the view type of the item at the given position (sent or received message)
     public int getItemViewType(int position) {
         if(chatMessages.get(position).sender.getToken().equals(sender.getToken())){
             return VIEW_TYPE_SENT;
@@ -82,7 +89,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         }
     }
 
-
+    // ViewHolder for Sent Messages
     static class SentMessageViewHolder extends RecyclerView.ViewHolder {
         private final ItemContainerSentMessageBinding binding;
 
@@ -96,7 +103,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             binding.sentMessageDate.setText(chatMessage.dateTime);
         }
     }
-
+    // ViewHolder for Received Messages
     static class ReceivedMessageViewHolder extends RecyclerView.ViewHolder {
         private final ItemContainerReceivedMessageBinding binding;
 
@@ -105,7 +112,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
             binding = itemContainerReceivedMessageBinding;
         }
 
-
+        // Method to set data for ReceivedMessageViewHolder
         void setData(ChatMessage chatMessage){
             binding.receivedMessageText.setText(chatMessage.message);
             binding.receivedMessageDate.setText(chatMessage.dateTime);

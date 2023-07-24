@@ -27,6 +27,12 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+/* This activity request the user to input an email, first name, last name, password.
+* These will be saved in the database, with a non-admin permission.
+* */
+
+
+
 public class RegisterActivity extends AppCompatActivity {
 
 
@@ -59,7 +65,7 @@ public class RegisterActivity extends AppCompatActivity {
         editTextSurname = (TextInputEditText) findViewById(R.id.register_surname);
         buttonRegister = (Button) findViewById(R.id.register_button);
         TextView textViewLogin = (TextView) findViewById(R.id.goto_login_text);
-
+        // Set click listener to navigate to LoginActivity
         textViewLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,7 +82,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-
+        // Set a click listener on the Register button
         buttonRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,7 +92,7 @@ public class RegisterActivity extends AppCompatActivity {
                 String password = String.valueOf(editTextPassword.getText()).trim();
                 String firstName = String.valueOf(editTextFirstName.getText()).trim();
                 String surname = String.valueOf(editTextSurname.getText()).trim();
-
+                // request all fields until all of them have values
                 if (email.isEmpty() || password.isEmpty() || firstName.isEmpty() || surname.isEmpty()) {
                     Toast.makeText(RegisterActivity.this, "Invalid credentials", Toast.LENGTH_SHORT).show();
 //                    progressBar.setVisibility(View.GONE);
@@ -110,11 +116,10 @@ public class RegisterActivity extends AppCompatActivity {
                         editTextPassword.setError("Password is required");
                         editTextPassword.requestFocus();
                     }
-
                     return;
-
                 }
-
+                // Register the user with Firebase Authentication
+                // Add created used to database
                 mAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
